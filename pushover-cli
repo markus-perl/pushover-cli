@@ -59,6 +59,19 @@ class Pushover:
         self.printLn("Command Line Pushover Client 0.2 by Markus Perl - https://github.com/markus-perl/pushover-cli")
         self.printLn("")
 
+    def validate(self):
+
+        if self.user == None:
+            self.printLn('No user set')
+            self.usage()
+            self.exit(1)
+
+        if self.token == None:
+            self.printLn('No token set')
+            self.usage()
+            self.exit(1)
+
+
     def parseConfig(self):
         if os.path.isfile(self.configFile):
             ini_str = '[root]\n' + open(self.configFile, 'r').read()
@@ -135,6 +148,8 @@ class Pushover:
                     self.url = a
 
             self.printHeader()
+
+            self.validate()
 
             if self.message == "-":
 
