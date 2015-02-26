@@ -2,12 +2,14 @@ pushover-cli
 ==========
 
 pushover-cli is a command line client for https://pushover.net to send pushover notifications.
-Moreover it is possible with this client to pipe streams directly to your cellphone like tail -f /var/log/my.log | pushover -
+Moreover it is possible with this client to pipe streams directly to your cellphone like tail -f /var/log/my.log | pushover-cli -
 
 Requirements
 ------------
 * Linux or Mac OSX
 * Python 2.7
+* Your own pushover application token, which can be created here: https://pushover.net/apps/build (Type: Script)
+* Your pushover user key, which can be found here after logging in: https://pushover.net
 
 
 Download and installation
