@@ -1,0 +1,200 @@
+#!/usr/bin/env python
+
+import getopt
+import sys
+import os
+import ConfigParser
+import StringIO
+import httplib
+import urllib
+
+
+class Pushover:
+    PRIORITY_HIGH = 1
+
+    PRIORITY_LOW = -1
+
+    PRIORITY_NORMAL = 0
+
+    priorities = {"high": PRIORITY_HIGH, "normal": PRIORITY_NORMAL, 'low': PRIORITY_LOW}
+
+    verbose = False
+
+    user = None
+    token = None
+    priority = PRIORITY_NORMAL
+    url = None
+    message = ""
+    title = ""
+    configFile = "/etc/pushover.conf"
+    quiet = False
+
+    def printLn(self, message):
+        if self.quiet == False:
+            print message
+
+    def exit(self, code):
+        self.printLn("")
+        sys.exit(code)
+
+    def usage(self):
+        """
+        Print Usage Information
+
+        :return:
+        """
+        print "Usage:   " + sys.argv[0] + " [options] <message> <title>"
+        print "Stdin:   " + sys.argv[0] + " [options] - <title>"
+        print "Example: " + sys.argv[0] + " -u ubLBe5u3zNXF9gBtX2zKkezSuPgu3v -t aK5BW3sjAqPsedH44VyQSbaQecoRen \"Hello World\""
+        print ""
+        print "  -u --user     <user id>             Pushover User-ID"
+        print "  -t --token    <api token>           Pushover API-Token"
+        print "  -p --priority <high, normal, low>   Default: normal"
+        print "  -l --url      <url>                 Link the message to this URL"
+        print "  -c --config   <path to file>        Default: /etc/pushover.conf"
+        print "  -v --verbose                        Be verbose"
+        print "  -q --quiet                          Be quiet"
+
+    def printHeader(self):
+        self.printLn("Command Line Pushover Client 0.2 by Markus Perl - https://github.com/markus-perl/pushover")
+        self.printLn("")
+
+    def parseConfig(self):
+        if os.path.isfile(self.configFile):
+            ini_str = '[root]\n' + open(self.configFile, 'r').read()
+            ini_fp = StringIO.StringIO(ini_str)
+            config = ConfigParser.RawConfigParser()
+            config.readfp(ini_fp)
+
+            if config.has_option("root", "user"):
+                self.user = config.get("root", "user")
+
+            if config.has_option("root", "token"):
+                self.token = config.get("root", "token")
+
+            if config.has_option("root", "url"):
+                self.url = config.get("root", "url")
+
+            if config.has_option("root", "priority"):
+                for name, priority in self.priorities.iteritems():
+                    if name == config.get("root", "priority"):
+                        self.priority = priority
+
+            if config.has_option("root", "verbose"):
+                if config.get("root", "verbose") in ("1", "On", "on"):
+                    self.verbose = True
+
+            if config.has_option("root", "quiet"):
+                if config.get("root", "quiet") in ("1", "On", "on"):
+                    self.verbose = True
+
+
+    def main(self):
+        """
+        Main Method
+
+        :return:
+        """
+
+
+        self.parseConfig()
+
+        try:
+            opts, args = getopt.getopt(sys.argv[1:], "hqvu:t:p:u:c:l:",
+                                       ["help", "user=", "token=", "priority=", "url=", "config=", "verbose", "quiet"])
+        except getopt.GetoptError as err:
+            print str(err)
+            self.printHeader();
+            self.usage()
+            self.exit(2)
+
+        if len(args) > 0:
+            self.message = args.pop(0)
+
+            if len(args) > 0:
+                self.title = args.pop(0)
+
+            for o, a in opts:
+                if o in ("-h", "--help"):
+                    self.printHeader()
+                    self.usage()
+                    self.exit(0)
+                elif o in ("-v", "--verbose"):
+                    self.verbose = True
+                elif o in ("-q", "--quiet"):
+                    self.quiet = True
+                elif o in ("-u", "--user"):
+                    self.user = a
+                elif o in ("-t", "--token"):
+                    self.token = a
+                elif o in ("-p", "--priority"):
+                    for name, priority in self.priorities.iteritems():
+                        if name == a:
+                            self.priority = priority
+                elif o in ("-l", "--url"):
+                    self.url = a
+
+            self.printHeader()
+
+            if self.message == "-":
+
+                while True:
+                    try:
+                        line = sys.stdin.readline().strip()
+                        if len(line) > 0:
+                            self.message = line
+                            self.send()
+                    except KeyboardInterrupt:
+                        break
+                    if not line:
+                        print "line break"
+                        break
+
+            else:
+
+                if self.send() == False:
+                    self.exit(2)
+                else:
+                    self.exit(0)
+        else:
+            self.printHeader()
+            self.usage()
+            self.exit(2)
+
+
+    def send(self):
+        """
+        Send the message
+
+        :return:
+        """
+        if self.verbose:
+            self.printLn("User: " + self.user)
+            self.printLn("Token: " + self.token)
+            self.printLn("Priority: " + str(self.priority))
+            self.printLn("Url: " + str(self.url))
+            self.printLn("Message: " + self.message)
+            self.printLn("Title: " + self.title)
+
+        conn = httplib.HTTPSConnection("api.pushover.net:443")
+        conn.request("POST", "/1/messages.json",
+                     urllib.urlencode({
+                         "token": self.token,
+                         "user": self.user,
+                         "title": self.title,
+                         "message": self.message,
+                         "priority": self.priority,
+                     }), {"Content-type": "application/x-www-form-urlencoded"})
+        response = conn.getresponse()
+
+        if response.status == 200:
+            self.printLn("Message \"" + self.message + "\" sent successfully")
+            return True
+        else:
+            self.printLn(response.reason)
+            return False
+
+
+if __name__ == "__main__":
+    pushover = Pushover()
+    pushover.main()
