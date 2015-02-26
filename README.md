@@ -39,7 +39,7 @@ Commandline options
 Config file
 -------------------
 
-Every command line option can be set by creating the config file /etc/pushover-cli.conf
+Every command line option can also be set by creating the config file /etc/pushover-cli.conf
 
 Example file:
 
@@ -49,7 +49,7 @@ Example file:
     verbose=0
     quiet=0
     
-After creating this file it is no more necessary to specify this options in the command line so a message could easily be sent by
+After creating this file it is no more necessary to specify these options in the command line which makes it more easier to send a message:
     $ pushover "My Message" "My Title"
 
 
