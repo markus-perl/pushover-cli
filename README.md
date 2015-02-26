@@ -21,9 +21,9 @@ Simply execute the following command to install the latest version of this scrip
 Commandline options
 -------------------
 
-    Usage:   ./pushover [options] <message> <title>
-    Stdin:   ./pushover [options] - <title>
-    Example: ./pushover -u ubLBe5u3zNXF9gBtX2zKkezSuPgu3v -t aK5BW3sjAqPsedH44VyQSbaQecoRen "Hello World"
+    Usage:   ./pushover-cli [options] <message> <title>
+    Stdin:   ./pushover-cli [options] - <title>
+    Example: ./pushover-cli -u ubLBe5u3zNXF9gBtX2zKkezSuPgu3v -t aK5BW3sjAqPsedH44VyQSbaQecoRen "Hello World"
 
       -u --user     <user id>             Pushover User-ID
       -t --token    <api token>           Pushover API-Token

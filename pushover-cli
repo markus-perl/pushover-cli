@@ -43,9 +43,10 @@ class Pushover:
 
         :return:
         """
-        print "Usage:   " + sys.argv[0] + " [options] <message> <title>"
-        print "Stdin:   " + sys.argv[0] + " [options] - <title>"
-        print "Example: " + sys.argv[0] + " -u ubLBe5u3zNXF9gBtX2zKkezSuPgu3v -t aK5BW3sjAqPsedH44VyQSbaQecoRen \"Hello World\""
+        file = os.path.basename(__file__)
+        print "Usage:   " + file + " [options] <message> <title>"
+        print "Stdin:   " + file + " [options] - <title>"
+        print "Example: " + file + " -u ubLBe5u3zNXF9gBtX2zKkezSuPgu3v -t aK5BW3sjAqPsedH44VyQSbaQecoRen \"Hello World\""
         print ""
         print "  -u --user     <user id>             Pushover User-ID"
         print "  -t --token    <api token>           Pushover API-Token"
