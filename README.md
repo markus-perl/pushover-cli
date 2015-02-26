@@ -37,7 +37,7 @@ Commandline options
 Config file
 -------------------
 
-Every command line option can be set by creating the config file /etc/pushover.conf
+Every command line option can be set by creating the config file /etc/pushover-cli.conf
 
 Example file:
 
