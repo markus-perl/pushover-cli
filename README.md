@@ -1,8 +1,8 @@
-pushover
+pushover-cli
 ==========
 
-pushover is a simple client for https://pushover.net/ to send pushover notifications through the command line.
-Moreover it is possible with this client to pipe streams to your cellphone like tail -f /var/log/my.log | pushover -
+pushover-cli is a command line client for https://pushover.net to send pushover notifications.
+Moreover it is possible with this client to pipe streams directly to your cellphone like tail -f /var/log/my.log | pushover -
 
 Requirements
 ------------
@@ -15,7 +15,7 @@ Download and installation
 
 Simply execute the following command to install the latest version of this script to your system:
 
-    sudo curl -o /usr/bin/pushover https://raw.githubusercontent.com/markus-perl/pushover/master/pushover && sudo chmod 555 /usr/bin/pushover
+    sudo curl -o /usr/bin/pushover-cli https://raw.githubusercontent.com/markus-perl/pushover-cli/master/pushover-cli && sudo chmod 555 /usr/bin/pushover-cli
     
 
 Commandline options

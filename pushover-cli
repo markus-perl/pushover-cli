@@ -26,7 +26,7 @@ class Pushover:
     url = None
     message = ""
     title = ""
-    configFile = "/etc/pushover.conf"
+    configFile = "/etc/pushover-cli.conf"
     quiet = False
 
     def printLn(self, message):
@@ -51,12 +51,12 @@ class Pushover:
         print "  -t --token    <api token>           Pushover API-Token"
         print "  -p --priority <high, normal, low>   Default: normal"
         print "  -l --url      <url>                 Link the message to this URL"
-        print "  -c --config   <path to file>        Default: /etc/pushover.conf"
+        print "  -c --config   <path to file>        Default: " + self.configFile
         print "  -v --verbose                        Be verbose"
         print "  -q --quiet                          Be quiet"
 
     def printHeader(self):
-        self.printLn("Command Line Pushover Client 0.2 by Markus Perl - https://github.com/markus-perl/pushover")
+        self.printLn("Command Line Pushover Client 0.2 by Markus Perl - https://github.com/markus-perl/pushover-cli")
         self.printLn("")
 
     def parseConfig(self):
