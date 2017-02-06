@@ -88,7 +88,7 @@ class Pushover:
 
             if config.has_option("root", "url"):
                 self.url = config.get("root", "url")
-
+                
             if config.has_option("root", "priority"):
                 for name, priority in self.priorities.iteritems():
                     if name == config.get("root", "priority"):
@@ -133,6 +133,9 @@ class Pushover:
                     self.printHeader()
                     self.usage()
                     self.exit(0)
+                elif o in ("-c", "--config"):
+                	self.configFile = a
+                	self.parseConfig()
                 elif o in ("-v", "--verbose"):
                     self.verbose = True
                 elif o in ("-q", "--quiet"):
