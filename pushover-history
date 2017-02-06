@@ -7,6 +7,10 @@ import ConfigParser
 import StringIO
 import httplib
 import urllib
+import shutil
+import difflib
+import socket
+import time
 
 
 class Pushover:
@@ -28,6 +32,9 @@ class Pushover:
     title = ""
     configFile = "/etc/pushover-cli.conf"
     quiet = False
+    background = False
+    diffFile = "/tmp/.pushover-history"
+    bashHistoryFile = os.path.expanduser("~/.bash_history")
 
     def printLn(self, message):
         if self.quiet == False:
@@ -44,17 +51,16 @@ class Pushover:
         :return:
         """
         file = os.path.basename(__file__)
-        print "Usage:   " + file + " [options] <message> <title>"
-        print "Stdin:   " + file + " [options] - <title>"
-        print "Example: " + file + " -u ubLBe5u3zNXF9gBtX2zKkezSuPgu3v -t aK5BW3sjAqPsedH44VyQSbaQecoRen \"Hello World\""
+        print "Usage:   " + file + " [options]"
+        print "Stdin:   " + file + " [options]"
         print ""
         print "  -u --user     <user id>             Pushover User-ID"
         print "  -t --token    <api token>           Pushover API-Token"
         print "  -p --priority <high, normal, low>   Default: normal"
-        print "  -l --url      <url>                 Link the message to this URL"
         print "  -c --config   <path to file>        Default: " + self.configFile
         print "  -v --verbose                        Be verbose"
         print "  -q --quiet                          Be quiet"
+        print "  -b --background                     Run in background"
 
     def printHeader(self):
         self.printLn("Command Line Pushover Client 0.2 by Markus Perl - https://github.com/markus-perl/pushover-cli")
@@ -71,7 +77,6 @@ class Pushover:
             self.printLn('No token set')
             self.usage()
             self.exit(1)
-
 
     def parseConfig(self):
         if os.path.isfile(self.configFile):
@@ -102,7 +107,6 @@ class Pushover:
                 if config.get("root", "quiet") in ("1", "On", "on"):
                     self.verbose = True
 
-
     def main(self):
         """
         Main Method
@@ -110,72 +114,49 @@ class Pushover:
         :return:
         """
 
-
         self.parseConfig()
 
         try:
-            opts, args = getopt.getopt(sys.argv[1:], "hqvu:t:p:u:c:l:",
-                                       ["help", "user=", "token=", "priority=", "url=", "config=", "verbose", "quiet"])
+            opts, args = getopt.getopt(sys.argv[1:], "hbqvu:t:p:u:c:l:",
+                                       ["help", "user=", "token=", "priority=", "url=", "config=", "verbose", "quiet",
+                                        "background"])
         except getopt.GetoptError as err:
             print str(err)
-            self.printHeader();
+            self.printHeader()
             self.usage()
             self.exit(2)
 
-        if len(args) > 0:
-            self.message = args.pop(0)
+        for o, a in opts:
+            if o in ("-h", "--help"):
+                self.printHeader()
+                self.usage()
+                self.exit(0)
+            elif o in ("-v", "--verbose"):
+                self.verbose = True
+            elif o in ("-q", "--quiet"):
+                self.quiet = True
+            elif o in ("-b", "--background"):
+                self.background = True
+            elif o in ("-u", "--user"):
+                self.user = a
+            elif o in ("-t", "--token"):
+                self.token = a
+            elif o in ("-p", "--priority"):
+                for name, priority in self.priorities.iteritems():
+                    if name == a:
+                        self.priority = priority
 
-            if len(args) > 0:
-                self.title = args.pop(0)
+        self.printHeader()
 
-            for o, a in opts:
-                if o in ("-h", "--help"):
-                    self.printHeader()
-                    self.usage()
-                    self.exit(0)
-                elif o in ("-v", "--verbose"):
-                    self.verbose = True
-                elif o in ("-q", "--quiet"):
-                    self.quiet = True
-                elif o in ("-u", "--user"):
-                    self.user = a
-                elif o in ("-t", "--token"):
-                    self.token = a
-                elif o in ("-p", "--priority"):
-                    for name, priority in self.priorities.iteritems():
-                        if name == a:
-                            self.priority = priority
-                elif o in ("-l", "--url"):
-                    self.url = a
+        self.validate()
 
-            self.printHeader()
-
-            self.validate()
-
-            if self.message == "-":
-
-                while True:
-                    try:
-                        line = sys.stdin.readline().strip()
-                        if len(line) > 0:
-                            self.message = line
-                            self.send()
-                    except KeyboardInterrupt:
-                        break
-                    if not line:
-                        break
-
-            else:
-
-                if self.send() == False:
-                    self.exit(2)
-                else:
-                    self.exit(0)
+        if self.background:
+            self.runBackground()
         else:
-            self.printHeader()
-            self.usage()
-            self.exit(2)
-
+            if self.send() == False:
+                self.exit(2)
+            else:
+                self.exit(0)
 
     def send(self):
         """
@@ -191,23 +172,56 @@ class Pushover:
             self.printLn("Message: " + self.message)
             self.printLn("Title: " + self.title)
 
-        conn = httplib.HTTPSConnection("api.pushover.net:443")
-        conn.request("POST", "/1/messages.json",
-                     urllib.urlencode({
-                         "token": self.token,
-                         "user": self.user,
-                         "title": self.title,
-                         "message": self.message,
-                         "priority": self.priority,
-                     }), {"Content-type": "application/x-www-form-urlencoded"})
-        response = conn.getresponse()
+        diffFile = "/tmp/.pushover-history"
+        bashHistoryFile = os.path.expanduser("~/.bash_history")
 
-        if response.status == 200:
-            self.printLn("Message \"" + self.message + "\" sent successfully")
+        if os.path.isfile(self.bashHistoryFile) == False:
+            self.printLn("Bash history file " + bashHistoryFile + " not found")
+            self.exit(2)
+
+        if os.path.isfile(self.diffFile) == False:
+            self.printLn("Initial bash history saving to " + diffFile)
+            shutil.copy(self.bashHistoryFile, self.diffFile)
             return True
+
+        count = 0
+        self.message = "pushover-history " + socket.gethostname() + ":\n"
+        diff = difflib.unified_diff(open(self.diffFile).readlines(), open(self.bashHistoryFile).readlines())
+        for line in diff:
+            if line[0] == "+" and line[:3] != "+++":
+                self.message += line.strip()[1:] + "\n"
+                count += 1
+
+        if count:
+            shutil.copy(self.bashHistoryFile, self.diffFile)
+
+            conn = httplib.HTTPSConnection("api.pushover.net:443")
+            conn.request("POST", "/1/messages.json",
+                         urllib.urlencode({
+                             "token": self.token,
+                             "user": self.user,
+                             "title": self.title,
+                             "message": self.message,
+                             "priority": self.priority,
+                         }), {"Content-type": "application/x-www-form-urlencoded"})
+            response = conn.getresponse()
+
+            if response.status == 200:
+                self.printLn("Message \"" + self.message + "\" sent successfully")
+                return True
+            else:
+                self.printLn(response.reason)
+                return False
         else:
-            self.printLn(response.reason)
-            return False
+            return True
+
+    def runBackground(self):
+        if os.path.isfile(self.diffFile):
+            os.remove(self.diffFile)
+
+        while 1:
+            self.send()
+            time.sleep(30)
 
 
 if __name__ == "__main__":
