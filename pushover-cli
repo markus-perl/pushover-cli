@@ -100,7 +100,7 @@ class Pushover:
 
             if config.has_option("root", "quiet"):
                 if config.get("root", "quiet") in ("1", "On", "on"):
-                    self.verbose = True
+                    self.quiet = True
 
 
     def main(self):
