@@ -7,6 +7,7 @@ import ConfigParser
 import StringIO
 import httplib
 import urllib
+import re
 
 
 class Pushover:
@@ -193,8 +194,17 @@ class Pushover:
             self.printLn("Url: " + str(self.url))
             self.printLn("Message: " + self.message)
             self.printLn("Title: " + self.title)
-
-        conn = httplib.HTTPSConnection("api.pushover.net:443")
+        proxy = os.environ.get("http_proxy", "")
+        proxyreg = re.search('^http.*//(.+?):([0-9]+)', proxy)
+        if proxyreg:
+            proxyhost = proxyreg.group(1)
+            proxyport = proxyreg.group(2)
+            if self.verbose:
+                self.printLn("Proxy: " + proxyhost + ":" + proxyport)
+            conn = httplib.HTTPSConnection(proxyhost, proxyport)
+            conn.set_tunnel("api.pushover.net:443")
+        else:
+            conn = httplib.HTTPSConnection("api.pushover.net:443")
         conn.request("POST", "/1/messages.json",
                      urllib.urlencode({
                          "token": self.token,
