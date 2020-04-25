@@ -7,7 +7,7 @@ Moreover it is possible with this client to pipe streams directly to your cellph
 Note
 ----
 
-This is forked from [Markus Perl](https://github.com/markus-perl/pushover-cli)'s work, and is extended by:
+This is forked from [Markus Perl's work](https://github.com/markus-perl/pushover-cli), and is extended by:
 
 1. Adding Python 3.x support (*NOTE:*  This is no longer tested against Python 2.x)
 1. Adding the `device` parameter (allow you to target specific devices on your account)
