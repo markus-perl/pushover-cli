@@ -9,18 +9,18 @@ Note
 
 This is forked from [Markus Perl's work](https://github.com/markus-perl/pushover-cli), and is extended by:
 
-1. Adding Python 3.x support (*NOTE:*  This is no longer tested against Python 2.x)
-1. Adding the `device` parameter (allow you to target specific devices on your account)
-1. Incorporating the 2 outstanding PRs on the original code that were open at the time I forked this.  Specifically:
-   a. Adding proxy support via the `HTTP_ENV` environment variable
-   a. Fixing the `--quiet` flag
+*. Adding Python 3.x support (*NOTE:*  This is no longer tested against Python 2.x)
+*. Adding the `device` parameter (allow you to target specific devices on your account)
+*. Incorporating the 2 outstanding PRs on the original code that were open at the time I forked this.  Specifically:
+   1. Adding proxy support via the `HTTP_ENV` environment variable
+   2. Fixing the `--quiet` flag
 
 Requirements
 ------------
 * Linux (including WSL) or Mac OSX
 * Python 3.x
-* Your own pushover application token, which can be created here: https://pushover.net/apps/build (Type: Script)
-* Your pushover user key, which can be found here after logging in: https://pushover.net
+* Your own [https://pushover.net/apps/build](pushover application token).
+* Your pushover user key, which can be found [https://pushover.net](here).
 
 
 Download and installation
