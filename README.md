@@ -19,8 +19,8 @@ Requirements
 ------------
 * Linux (including WSL) or Mac OSX
 * Python 3.x
-* Your own [https://pushover.net/apps/build](pushover application token).
-* Your pushover user key, which can be found [https://pushover.net](here).
+* Your own [pushover application token](https://pushover.net/apps/build).
+* Your pushover user key, which can be found [here](https://pushover.net).
 
 
 Download and installation
