@@ -1,13 +1,12 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import getopt
 import sys
 import os
-import ConfigParser
-import StringIO
-import httplib
-import urllib
-
+import configparser
+import http.client as http
+from urllib.parse import urlencode
+import re
 
 class Pushover:
     PRIORITY_HIGH = 1
@@ -22,6 +21,7 @@ class Pushover:
 
     user = None
     token = None
+    device = "all"
     priority = PRIORITY_NORMAL
     url = None
     message = ""
@@ -31,7 +31,7 @@ class Pushover:
 
     def printLn(self, message):
         if self.quiet == False:
-            print message
+            print(message)
 
     def exit(self, code):
         self.printLn("")
@@ -44,22 +44,18 @@ class Pushover:
         :return:
         """
         file = os.path.basename(__file__)
-        print "Usage:   " + file + " [options] <message> <title>"
-        print "Stdin:   " + file + " [options] - <title>"
-        print "Example: " + file + " -u ubLBe5u3zNXF9gBtX2zKkezSuPgu3v -t aK5BW3sjAqPsedH44VyQSbaQecoRen \"Hello World\""
-        print ""
-        print "  -u --user     <user id>             Pushover User-ID"
-        print "  -t --token    <api token>           Pushover API-Token"
-        print "  -d --device   <device name>         Default: all"
-        print "  -p --priority <high, normal, low>   Default: normal"
-        print "  -l --url      <url>                 Link the message to this URL"
-        print "  -c --config   <path to file>        Default: " + self.configFile
-        print "  -v --verbose                        Be verbose"
-        print "  -q --quiet                          Be quiet"
-
-    def printHeader(self):
-        self.printLn("Command Line Pushover Client 0.2 by Markus Perl - https://github.com/markus-perl/pushover-cli")
-        self.printLn("")
+        print("Usage:   " + file + " [options] <message> <title>")
+        print("Stdin:   " + file + " [options] - <title>")
+        print("Example: " + file + " -u ubLBe5u3zNXF9gBtX2zKkezSuPgu3v -t aK5BW3sjAqPsedH44VyQSbaQecoRen \"Hello World\"")
+        print("")
+        print("  -u --user     <user id>             Pushover User-ID")
+        print("  -t --token    <api token>           Pushover API-Token")
+        print("  -d --device   <device name>         Default: all")
+        print("  -p --priority <high, normal, low>   Default: normal")
+        print("  -l --url      <url>                 Link the message to this URL")
+        print("  -c --config   <path to file>        Default: " + self.configFile)
+        print("  -v --verbose                        Be verbose")
+        print("  -q --quiet                          Be quiet")
 
     def validate(self):
 
@@ -76,10 +72,10 @@ class Pushover:
 
     def parseConfig(self):
         if os.path.isfile(self.configFile):
-            ini_str = '[root]\n' + open(self.configFile, 'r').read()
-            ini_fp = StringIO.StringIO(ini_str)
-            config = ConfigParser.RawConfigParser()
-            config.readfp(ini_fp)
+            with open(self.configFile, 'r') as f:
+                ini_str = '[root]\n' + f.read()
+            config = configparser.ConfigParser()
+            config.read_string(ini_str)
 
             if config.has_option("root", "user"):
                 self.user = config.get("root", "user")
@@ -104,7 +100,7 @@ class Pushover:
 
             if config.has_option("root", "quiet"):
                 if config.get("root", "quiet") in ("1", "On", "on"):
-                    self.verbose = True
+                    self.quiet = True
 
 
     def main(self):
@@ -121,8 +117,7 @@ class Pushover:
             opts, args = getopt.getopt(sys.argv[1:], "hqvu:t:d:p:u:c:l:",
                                        ["help", "user=", "token=", "device=", "priority=", "url=", "config=", "verbose", "quiet"])
         except getopt.GetoptError as err:
-            print str(err)
-            self.printHeader();
+            print(str(err))
             self.usage()
             self.exit(2)
 
@@ -134,7 +129,6 @@ class Pushover:
 
             for o, a in opts:
                 if o in ("-h", "--help"):
-                    self.printHeader()
                     self.usage()
                     self.exit(0)
                 elif o in ("-c", "--config"):
@@ -156,8 +150,6 @@ class Pushover:
                             self.priority = priority
                 elif o in ("-l", "--url"):
                     self.url = a
-
-            self.printHeader()
 
             self.validate()
 
@@ -181,7 +173,6 @@ class Pushover:
                 else:
                     self.exit(0)
         else:
-            self.printHeader()
             self.usage()
             self.exit(2)
 
@@ -201,7 +192,17 @@ class Pushover:
             self.printLn("Message: " + self.message)
             self.printLn("Title: " + self.title)
 
-        conn = httplib.HTTPSConnection("api.pushover.net:443")
+        proxy = os.environ.get("http_proxy", "")
+        proxyreg = re.search('^http.*//(.+?):([0-9]+)', proxy)
+        if proxyreg:
+            proxyhost = proxyreg.group(1)
+            proxyport = proxyreg.group(2)
+            if self.verbose:
+                self.printLn("Proxy: " + proxyhost + ":" + proxyport)
+            conn = httplib.HTTPSConnection(proxyhost, proxyport)
+            conn.set_tunnel("api.pushover.net:443")
+        else:
+            conn = http.HTTPSConnection("api.pushover.net:443")
 
         post_pack = {
             "token": self.token,
@@ -217,10 +218,10 @@ class Pushover:
         conn.request(
             "POST", 
             "/1/messages.json",
-            urllib.urlencode( post_pack ), 
+            urlencode( post_pack ), 
             {"Content-type": "application/x-www-form-urlencoded"}
         )
-        
+
         response = conn.getresponse()
 
         if response.status == 200:
