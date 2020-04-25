@@ -1,8 +1,13 @@
 pushover-cli
 ==========
 
-pushover-cli is a command line client for https://pushover.net to send pushover notifications.
-Moreover it is possible with this client to pipe streams directly to your cellphone like tail -f /var/log/my.log | pushover-cli -
+pushover-cli is a Python-based command-line client for https://pushover.net to send pushover notifications.  This can be used for a variety
+of purposes, including:
+
+* Sending control messages to an old phone running Youtube to start/pause/stop/etc. the playing video remotely.
+* Piping streams to your cellphone (e.g. `tail -f /var/log/my.log | pushover-cli -`)
+* It's essentially an MQTT channel, so anything that can read a pushover message can act on it.
+* Tie pushover notifications into your long-running scripts (build, cleanup, upgrade, etc.) to get notices of different system events.
 
 Note
 ----
