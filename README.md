@@ -9,8 +9,8 @@ Note
 
 This is forked from [Markus Perl](https://github.com/markus-perl/pushover-cli)'s work, and is extended by:
 
-1. Python 3.x support
-1. Adding support for the `device` parameter (allow you to target specific devices on your account)
+1. Adding Python 3.x support (*NOTE:*  This is no longer tested against Python 2.x)
+1. Adding the `device` parameter (allow you to target specific devices on your account)
 1. Incorporating the 2 outstanding PRs on the original code that were open at the time I forked this.  Specifically:
    a. Adding proxy support via the `HTTP_ENV` environment variable
    a. Fixing the `--quiet` flag
