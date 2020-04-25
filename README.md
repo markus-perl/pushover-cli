@@ -34,19 +34,20 @@ Simply execute the following command to install the latest version of this scrip
 Commandline options
 -------------------
 
-    Usage:   ./pushover-cli [options] <message> <title>
-    Stdin:   ./pushover-cli [options] - <title>
-    Example: ./pushover-cli -u ubLBe5u3zNXF9gBtX2zKkezSuPgu3v -t aK5BW3sjAqPsedH44VyQSbaQecoRen "Hello World"
+```
+Usage:   pushover-cli [options] <message> <title>
+Stdin:   pushover-cli [options] - <title>
+Example: pushover-cli -u ubLBe5u3zNXF9gBtX2zKkezSuPgu3v -t aK5BW3sjAqPsedH44VyQSbaQecoRen "Hello World"
 
-      -u --user     <user id>             Pushover User-ID
-      -t --token    <api token>           Pushover API-Token
-      -d --device   <device name>         Device Name (if omitted, will broadcast to all devices)
-      -p --priority <high, normal, low>   Default: normal
-      -l --url      <url>                 Link the message to this URL
-      -c --config   <path to file>        Default: /etc/pushover.conf
-      -v --verbose                        Be verbose
-      -q --quiet                          Be quiet
-
+    -u --user     <user id>             Pushover User-ID
+    -t --token    <api token>           Pushover API-Token
+    -d --device   <device name>         Device Name (if omitted, will broadcast to all devices)
+    -p --priority <high, normal, low>   Default: normal
+    -l --url      <url>                 Link the message to this URL
+    -c --config   <path to file>        Default: /etc/pushover.conf
+    -v --verbose                        Be verbose
+    -q --quiet                          Be quiet
+```
 
 Proxy Utilization
 -------------------
