@@ -199,7 +199,7 @@ class Pushover:
             proxyport = proxyreg.group(2)
             if self.verbose:
                 self.printLn("Proxy: " + proxyhost + ":" + proxyport)
-            conn = httplib.HTTPSConnection(proxyhost, proxyport)
+            conn = http.HTTPSConnection(proxyhost, proxyport)
             conn.set_tunnel("api.pushover.net:443")
         else:
             conn = http.HTTPSConnection("api.pushover.net:443")
