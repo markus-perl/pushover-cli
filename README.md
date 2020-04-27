@@ -9,17 +9,6 @@ of purposes, including:
 * It's essentially an MQTT channel, so anything that can read a pushover message can act on it.
 * Tie pushover notifications into your long-running scripts (build, cleanup, upgrade, etc.) to get notices of different system events.
 
-Note
-----
-
-This is forked from [Markus Perl's work](https://github.com/markus-perl/pushover-cli), and is extended by:
-
-* Adding Python 3.x support (*NOTE:*  This is no longer tested against Python 2.x)
-* Adding the `device` parameter (allow you to target specific devices on your account)
-* Incorporating the 2 outstanding PRs on the original code that were open at the time I forked this.  Specifically:
-  * Adding proxy support via the `HTTP_ENV` environment variable
-  * Fixing the `--quiet` flag
-
 Requirements
 ------------
 * Linux (including WSL) or Mac OSX
@@ -67,7 +56,7 @@ to Pushover through it.
 Config file
 -------------------
 
-Every command line option can also be set by creating the config file /etc/pushover-cli.conf
+Every command line option can also be set by creating the config file ~/.pushover-cli.conf or /etc/pushover-cli.conf
 
 Example file:
 

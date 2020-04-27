@@ -7,6 +7,8 @@ import configparser
 import http.client as http
 from urllib.parse import urlencode
 import re
+from pathlib import Path
+
 
 class Pushover:
     PRIORITY_HIGH = 1
@@ -46,7 +48,8 @@ class Pushover:
         file = os.path.basename(__file__)
         print("Usage:   " + file + " [options] <message> <title>")
         print("Stdin:   " + file + " [options] - <title>")
-        print("Example: " + file + " -u ubLBe5u3zNXF9gBtX2zKkezSuPgu3v -t aK5BW3sjAqPsedH44VyQSbaQecoRen \"Hello World\"")
+        print(
+            "Example: " + file + " -u ubLBe5u3zNXF9gBtX2zKkezSuPgu3v -t aK5BW3sjAqPsedH44VyQSbaQecoRen \"Hello World\"")
         print("")
         print("  -u --user     <user id>             Pushover User-ID")
         print("  -t --token    <api token>           Pushover API-Token")
@@ -69,13 +72,19 @@ class Pushover:
             self.usage()
             self.exit(1)
 
-
     def parseConfig(self):
+
+        if not os.path.isfile(self.configFile):
+            self.configFile = os.path.dirname(os.path.realpath(__file__)) + '/.pushover-cli.conf'
+
+        if not os.path.isfile(self.configFile):
+            self.configFile = str(Path.home()) + '/.pushover-cli.conf'
+
         if os.path.isfile(self.configFile):
             with open(self.configFile, 'r') as f:
                 ini_str = '[root]\n' + f.read()
-            config = configparser.ConfigParser()
-            config.read_string(ini_str)
+                config = configparser.ConfigParser()
+                config.read_string(ini_str)
 
             if config.has_option("root", "user"):
                 self.user = config.get("root", "user")
@@ -85,12 +94,12 @@ class Pushover:
 
             if config.has_option("root", "device"):
                 self.device = config.get("root", "device")
-                
+
             if config.has_option("root", "url"):
                 self.url = config.get("root", "url")
-                
+
             if config.has_option("root", "priority"):
-                for name, priority in self.priorities.iteritems():
+                for name, priority in self.priorities.items():
                     if name == config.get("root", "priority"):
                         self.priority = priority
 
@@ -102,7 +111,6 @@ class Pushover:
                 if config.get("root", "quiet") in ("1", "On", "on"):
                     self.quiet = True
 
-
     def main(self):
         """
         Main Method
@@ -110,12 +118,12 @@ class Pushover:
         :return:
         """
 
-
         self.parseConfig()
 
         try:
             opts, args = getopt.getopt(sys.argv[1:], "hqvu:t:d:p:u:c:l:",
-                                       ["help", "user=", "token=", "device=", "priority=", "url=", "config=", "verbose", "quiet"])
+                                       ["help", "user=", "token=", "device=", "priority=", "url=", "config=", "verbose",
+                                        "quiet"])
         except getopt.GetoptError as err:
             print(str(err))
             self.usage()
@@ -132,8 +140,8 @@ class Pushover:
                     self.usage()
                     self.exit(0)
                 elif o in ("-c", "--config"):
-                	self.configFile = a
-                	self.parseConfig()
+                    self.configFile = a
+                    self.parseConfig()
                 elif o in ("-v", "--verbose"):
                     self.verbose = True
                 elif o in ("-q", "--quiet"):
@@ -176,7 +184,6 @@ class Pushover:
             self.usage()
             self.exit(2)
 
-
     def send(self):
         """
         Send the message
@@ -216,9 +223,9 @@ class Pushover:
             post_pack["device"] = self.device
 
         conn.request(
-            "POST", 
+            "POST",
             "/1/messages.json",
-            urlencode( post_pack ), 
+            urlencode(post_pack),
             {"Content-type": "application/x-www-form-urlencoded"}
         )
 
