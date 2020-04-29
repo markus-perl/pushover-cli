@@ -19,6 +19,8 @@ class Pushover:
 
     priorities = {"high": PRIORITY_HIGH, "normal": PRIORITY_NORMAL, 'low': PRIORITY_LOW}
 
+    VERSION = "1.1.2"
+
     verbose = False
 
     user = None
@@ -46,6 +48,8 @@ class Pushover:
         :return:
         """
         file = os.path.basename(__file__)
+        print("pushover-cli v" + self.VERSION + " - https://github.com/markus-perl/pushover-cli")
+        print("")
         print("Usage:   " + file + " [options] <message> <title>")
         print("Stdin:   " + file + " [options] - <title>")
         print(
@@ -153,7 +157,7 @@ class Pushover:
                 elif o in ("-d", "--device"):
                     self.device = a
                 elif o in ("-p", "--priority"):
-                    for name, priority in self.priorities.iteritems():
+                    for name, priority in self.priorities.items():
                         if name == a:
                             self.priority = priority
                 elif o in ("-l", "--url"):
@@ -206,7 +210,7 @@ class Pushover:
             proxyport = proxyreg.group(2)
             if self.verbose:
                 self.printLn("Proxy: " + proxyhost + ":" + proxyport)
-            conn = http.HTTPSConnection(proxyhost, proxyport)
+            conn = http.HTTPSConnection(proxyhost, int(proxyport))
             conn.set_tunnel("api.pushover.net:443")
         else:
             conn = http.HTTPSConnection("api.pushover.net:443")
@@ -217,6 +221,7 @@ class Pushover:
             "title": self.title,
             "message": self.message,
             "priority": self.priority,
+            "url": self.url,
         }
 
         if self.device != 'all':
