@@ -23,7 +23,7 @@ Download and installation
 Simply execute the following command to install the latest version of this script to your system:
 
 ```sh
-sudo curl -o /usr/bin/pushover-cli https://raw.githubusercontent.com/scottjwalter/pushover-cli/master/pushover-cli 
+sudo curl -o /usr/bin/pushover-cli https://raw.githubusercontent.com/markus-perl/pushover-cli/master/pushover-cli 
 sudo chmod 555 /usr/bin/pushover-cli
 ```    
 
