@@ -40,6 +40,7 @@ Example: pushover-cli -u ubLBe5u3zNXF9gBtX2zKkezSuPgu3v -t aK5BW3sjAqPsedH44VyQS
     -d --device   <device name>         Device Name (if omitted, will broadcast to all devices)
     -p --priority <high, normal, low>   Default: normal
     -l --url      <url>                 Link the message to this URL
+    -s --sound    <notification sound>  Default: pushover - see https://pushover.net/api#sounds
     -c --config   <path to file>        Default: /etc/pushover.conf
     -v --verbose                        Be verbose
     -q --quiet                          Be quiet
@@ -70,11 +71,18 @@ quiet=0
 
 After creating this file it is no more necessary to specify these options in the command line which makes it more easier to send a message:
 ```sh
-$ pushover "My Message" "My Title"
+$ pushover-cli "My Message" "My Title"
 ```
 
 or
 
 ```sh
-$ pushover -d 'my_phone' 'My Message' 'My Title'
+$ pushover-cli -d 'my_phone' 'My Message' 'My Title'
 ```
+
+or
+
+```sh
+$ pushover-cli -s 'none' 'My Message' 'My Title'
+```
+for silent notification or use other tones https://pushover.net/api#sounds
