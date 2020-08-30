@@ -19,7 +19,7 @@ class Pushover:
 
     priorities = {"high": PRIORITY_HIGH, "normal": PRIORITY_NORMAL, 'low': PRIORITY_LOW}
 
-    VERSION = "1.1.2"
+    VERSION = "1.1.3"
 
     verbose = False
 
@@ -32,6 +32,7 @@ class Pushover:
     title = ""
     configFile = "/etc/pushover-cli.conf"
     quiet = False
+    sound = "pushover"
 
     def printLn(self, message):
         if self.quiet == False:
@@ -60,6 +61,7 @@ class Pushover:
         print("  -d --device   <device name>         Default: all")
         print("  -p --priority <high, normal, low>   Default: normal")
         print("  -l --url      <url>                 Link the message to this URL")
+        print("  -s --sound    <notification sound>  Default: pushover - see https://pushover.net/api#sounds")
         print("  -c --config   <path to file>        Default: " + self.configFile)
         print("  -v --verbose                        Be verbose")
         print("  -q --quiet                          Be quiet")
@@ -106,6 +108,8 @@ class Pushover:
                 for name, priority in self.priorities.items():
                     if name == config.get("root", "priority"):
                         self.priority = priority
+            if config.has_option("root", "sound"):
+                self.sound = config.get("root", "sound")
 
             if config.has_option("root", "verbose"):
                 if config.get("root", "verbose") in ("1", "On", "on"):
@@ -125,8 +129,8 @@ class Pushover:
         self.parseConfig()
 
         try:
-            opts, args = getopt.getopt(sys.argv[1:], "hqvu:t:d:p:u:c:l:",
-                                       ["help", "user=", "token=", "device=", "priority=", "url=", "config=", "verbose",
+            opts, args = getopt.getopt(sys.argv[1:], "hqvu:t:d:p:u:c:l:s:",
+                                       ["help", "user=", "token=", "device=", "priority=", "url=", "config=", "sound=", "verbose",
                                         "quiet"])
         except getopt.GetoptError as err:
             print(str(err))
@@ -162,6 +166,8 @@ class Pushover:
                             self.priority = priority
                 elif o in ("-l", "--url"):
                     self.url = a
+                elif o in ("-s", "--sound"):
+                    self.sound = a
 
             self.validate()
 
@@ -202,6 +208,7 @@ class Pushover:
             self.printLn("Url: " + str(self.url))
             self.printLn("Message: " + self.message)
             self.printLn("Title: " + self.title)
+            self.printLn("Sound: " + self.sound)
 
         proxy = os.environ.get("http_proxy", "")
         proxyreg = re.search('^http.*//(.+?):([0-9]+)', proxy)
@@ -222,6 +229,7 @@ class Pushover:
             "message": self.message,
             "priority": self.priority,
             "url": self.url,
+            "sound": self.sound,
         }
 
         if self.device != 'all':
