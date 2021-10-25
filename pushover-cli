@@ -27,7 +27,7 @@ class Pushover:
     token = None
     device = "all"
     priority = PRIORITY_NORMAL
-    url = None
+    url = ""
     message = ""
     title = ""
     configFile = "/etc/pushover-cli.conf"
