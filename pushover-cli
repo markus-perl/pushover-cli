@@ -138,10 +138,10 @@ class Pushover:
             self.exit(2)
 
         if len(args) > 0:
-            self.message = args.pop(0)
+            self.message = args.pop(0).replace('\\n', '\n').replace('\\t', '\t')
 
             if len(args) > 0:
-                self.title = args.pop(0)
+                self.title = args.pop(0).replace('\\n', '\n').replace('\\t', '\t')
 
             for o, a in opts:
                 if o in ("-h", "--help"):
