@@ -38,7 +38,7 @@ Example: pushover-cli -u ubLBe5u3zNXF9gBtX2zKkezSuPgu3v -t aK5BW3sjAqPsedH44VyQS
     -u --user     <user id>             Pushover User-ID
     -t --token    <api token>           Pushover API-Token
     -d --device   <device name>         Device Name (if omitted, will broadcast to all devices)
-    -p --priority <high, normal, low>   Default: normal
+    -p --priority <highest, high, normal, low, lowest>   Default: normal
     -l --url      <url>                 Link the message to this URL
     -s --sound    <notification sound>  Default: pushover - see https://pushover.net/api#sounds
     -c --config   <path to file>        Default: /etc/pushover.conf
