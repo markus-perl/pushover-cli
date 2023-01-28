@@ -11,15 +11,19 @@ from pathlib import Path
 
 
 class Pushover:
+    PRIORITY_HIGHEST = 2
+    
     PRIORITY_HIGH = 1
-
-    PRIORITY_LOW = -1
-
+    
     PRIORITY_NORMAL = 0
 
-    priorities = {"high": PRIORITY_HIGH, "normal": PRIORITY_NORMAL, 'low': PRIORITY_LOW}
+    PRIORITY_LOW = -1
+    
+    PRIORITY_LOWEST = -2
 
-    VERSION = "1.1.3"
+    priorities = {"highest": PRIORITY_HIGHEST, "high": PRIORITY_HIGH, "normal": PRIORITY_NORMAL, "low": PRIORITY_LOW, "lowest": PRIORITY_LOWEST}
+
+    VERSION = "1.2.0"
 
     verbose = False
 
@@ -59,7 +63,7 @@ class Pushover:
         print("  -u --user     <user id>             Pushover User-ID")
         print("  -t --token    <api token>           Pushover API-Token")
         print("  -d --device   <device name>         Default: all")
-        print("  -p --priority <high, normal, low>   Default: normal")
+        print("  -p --priority <highest, high, normal, low, lowest>   Default: normal")
         print("  -l --url      <url>                 Link the message to this URL")
         print("  -s --sound    <notification sound>  Default: pushover - see https://pushover.net/api#sounds")
         print("  -c --config   <path to file>        Default: " + self.configFile)
