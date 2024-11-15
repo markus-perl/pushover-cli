@@ -66,7 +66,7 @@ class Pushover:
         print("  -t --token    <api token>           Pushover API-Token")
         print("  -d --device   <device name>         Default: all")
         print("  -p --priority <highest, high, normal, low, lowest>   Default: normal")
-        print("  -r --retry    <30+>          Default: 30")
+        print("  -r --retry    <30+>                 Default: 30")
         print("  -e --expire   <30 - 10800>          Default: 300")
         print("  -l --url      <url>                 Link the message to this URL")
         print("  -s --sound    <notification sound>  Default: pushover - see https://pushover.net/api#sounds")
