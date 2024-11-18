@@ -23,7 +23,7 @@ class Pushover:
 
     priorities = {"highest": PRIORITY_HIGHEST, "high": PRIORITY_HIGH, "normal": PRIORITY_NORMAL, "low": PRIORITY_LOW, "lowest": PRIORITY_LOWEST}
 
-    VERSION = "1.2.0"
+    VERSION = "1.3.0"
 
     verbose = False
 
@@ -37,6 +37,8 @@ class Pushover:
     configFile = "/etc/pushover-cli.conf"
     quiet = False
     sound = "pushover"
+    expire = "300"
+    retry = "30"
 
     def printLn(self, message):
         if self.quiet == False:
@@ -64,11 +66,14 @@ class Pushover:
         print("  -t --token    <api token>           Pushover API-Token")
         print("  -d --device   <device name>         Default: all")
         print("  -p --priority <highest, high, normal, low, lowest>   Default: normal")
+        print("  -r --retry    <30+>                 Default: 30")
+        print("  -e --expire   <30 - 10800>          Default: 300")
         print("  -l --url      <url>                 Link the message to this URL")
         print("  -s --sound    <notification sound>  Default: pushover - see https://pushover.net/api#sounds")
         print("  -c --config   <path to file>        Default: " + self.configFile)
         print("  -v --verbose                        Be verbose")
         print("  -q --quiet                          Be quiet")
+        print("Note: 'retry' and 'expire' are only used when priority=highest")
 
     def validate(self):
 
@@ -102,6 +107,12 @@ class Pushover:
             if config.has_option("root", "token"):
                 self.token = config.get("root", "token")
 
+            if config.has_option("root", "retry"):
+                self.retry = config.get("root", "retry")
+
+            if config.has_option("root", "expire"):
+                self.expire = config.get("root", "expire")
+
             if config.has_option("root", "device"):
                 self.device = config.get("root", "device")
 
@@ -133,8 +144,8 @@ class Pushover:
         self.parseConfig()
 
         try:
-            opts, args = getopt.getopt(sys.argv[1:], "hqvu:t:d:p:u:c:l:s:",
-                                       ["help", "user=", "token=", "device=", "priority=", "url=", "config=", "sound=", "verbose",
+            opts, args = getopt.getopt(sys.argv[1:], "hqvu:t:d:p:u:c:l:s:e:r:",
+                                       ["help", "user=", "token=", "device=", "priority=", "url=", "config=", "sound=", "expire=", "retry=", "verbose",
                                         "quiet"])
         except getopt.GetoptError as err:
             print(str(err))
@@ -172,6 +183,10 @@ class Pushover:
                     self.url = a
                 elif o in ("-s", "--sound"):
                     self.sound = a
+                elif o in ("-e", "--expire"):
+                    self.expire = a
+                elif o in ("-r", "--retry"):
+                    self.retry = a
 
             self.validate()
 
@@ -213,6 +228,8 @@ class Pushover:
             self.printLn("Message: " + self.message)
             self.printLn("Title: " + self.title)
             self.printLn("Sound: " + self.sound)
+            self.printLn("Retry: " + self.retry)
+            self.printLn("Expire: " + self.expire)
 
         proxy = os.environ.get("http_proxy", "")
         proxyreg = re.search('^http.*//(.+?):([0-9]+)', proxy)
@@ -235,6 +252,10 @@ class Pushover:
             "url": self.url,
             "sound": self.sound,
         }
+
+        if str(self.priority) == '2':
+            post_pack["expire"] = self.expire
+            post_pack["retry"] = self.retry
 
         if self.device != 'all':
             post_pack["device"] = self.device
