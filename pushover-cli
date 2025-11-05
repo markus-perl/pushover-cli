@@ -73,6 +73,9 @@ class Pushover:
         print("  -c --config   <path to file>        Default: " + self.configFile)
         print("  -v --verbose                        Be verbose")
         print("  -q --quiet                          Be quiet")
+        print("  -H --html                           Use HTML output. Requires v2.3 client.")
+        print("  -M --monospace                      Use monospace font. Requires v3.4 client.")
+        print("  -m --multiline                      Send all lines read from stdin as a single message.")
         print("Note: 'retry' and 'expire' are only used when priority=highest")
 
     def validate(self):
@@ -134,6 +137,14 @@ class Pushover:
                 if config.get("root", "quiet") in ("1", "On", "on"):
                     self.quiet = True
 
+            if config.has_option("root", "html"):
+                if config.get("root", "html") in ("1", "On", "on"):
+                    self.html = True
+
+            if config.has_option("root", "monospace"):
+                if config.get("root", "monospace") in ("1", "On", "on"):
+                    self.monospace = True
+
     def main(self):
         """
         Main Method
@@ -187,21 +198,39 @@ class Pushover:
                     self.expire = a
                 elif o in ("-r", "--retry"):
                     self.retry = a
+                elif o in ("-H", "--html"):
+                    self.html = True
+                elif o in ("-m", "--multiline"):
+                    self.multiline = True
+                elif o in ("-M", "--monospace"):
+                    self.monospace = True
 
             self.validate()
 
             if self.message == "-":
-
-                while True:
-                    try:
-                        line = sys.stdin.readline().strip()
-                        if len(line) > 0:
-                            self.message = line
-                            self.send()
-                    except KeyboardInterrupt:
-                        break
-                    if not line:
-                        break
+                if self.multiline:
+                    self.message = ''
+                    while True:
+                        try:
+                            line = sys.stdin.readline()
+                            if len(line) > 0:
+                                self.message += line
+                        except KeyboardInterrupt:
+                            break
+                        if not line:
+                            break
+                    self.send()
+                else:
+                    while True:
+                        try:
+                            line = sys.stdin.readline().strip()
+                            if len(line) > 0:
+                                self.message = line
+                                self.send()
+                        except KeyboardInterrupt:
+                            break
+                        if not line:
+                            break
 
             else:
 
@@ -230,6 +259,8 @@ class Pushover:
             self.printLn("Sound: " + self.sound)
             self.printLn("Retry: " + self.retry)
             self.printLn("Expire: " + self.expire)
+            self.printLn("HTML: " + self.html)
+            self.printLn("Multiline: " + self.multiline)
 
         proxy = os.environ.get("http_proxy", "")
         proxyreg = re.search('^http.*//(.+?):([0-9]+)', proxy)
@@ -259,6 +290,12 @@ class Pushover:
 
         if self.device != 'all':
             post_pack["device"] = self.device
+
+        if self.html:
+            post_pack["html"] = '1'
+
+        if self.monospace:
+            post_pack["monospace"] = '1'
 
         conn.request(
             "POST",
