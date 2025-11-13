@@ -46,6 +46,9 @@ Example: pushover-cli -u ubLBe5u3zNXF9gBtX2zKkezSuPgu3v -t aK5BW3sjAqPsedH44VyQS
     -c --config   <path to file>        Default: /etc/pushover.conf
     -v --verbose                        Be verbose
     -q --quiet                          Be quiet
+    -H --html                           Use HTML output. Requires v2.3 client.
+    -M --monospace                      Use monospace font. Requires v3.4 client.
+    -m --multiline                      Send all lines read from stdin as a single message.
 ```
 
 Proxy Utilization
