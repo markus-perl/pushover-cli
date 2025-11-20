@@ -12,13 +12,13 @@ from pathlib import Path
 
 class Pushover:
     PRIORITY_HIGHEST = 2
-    
+
     PRIORITY_HIGH = 1
-    
+
     PRIORITY_NORMAL = 0
 
     PRIORITY_LOW = -1
-    
+
     PRIORITY_LOWEST = -2
 
     priorities = {"highest": PRIORITY_HIGHEST, "high": PRIORITY_HIGH, "normal": PRIORITY_NORMAL, "low": PRIORITY_LOW, "lowest": PRIORITY_LOWEST}
@@ -39,6 +39,9 @@ class Pushover:
     sound = "pushover"
     expire = "300"
     retry = "30"
+    html = False
+    monospace = False
+    multiline = False
 
     def printLn(self, message):
         if self.quiet == False:
@@ -259,8 +262,8 @@ class Pushover:
             self.printLn("Sound: " + self.sound)
             self.printLn("Retry: " + self.retry)
             self.printLn("Expire: " + self.expire)
-            self.printLn("HTML: " + self.html)
-            self.printLn("Multiline: " + self.multiline)
+            self.printLn("HTML: " + str(self.html))
+            self.printLn("Multiline: " + str(self.multiline))
 
         proxy = os.environ.get("http_proxy", "")
         proxyreg = re.search('^http.*//(.+?):([0-9]+)', proxy)
